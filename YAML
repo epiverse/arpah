@@ -1,0 +1,43 @@
+name: Node.js CI
+
+# Trigger the workflow on push or pull request events on the 'main' branch
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Define the jobs to run
+jobs:
+  build-and-test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Use a matrix strategy to test on multiple Node.js versions
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x] # Adjust versions as needed
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Set up Node.js using the version defined in the matrix
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm' # Cache npm dependencies to speed up workflows
+
+      # Install project dependencies (replace 'npm ci' with 'yarn install' if using Yarn)
+      - name: Install dependencies
+        run: npm ci
+
+      # Build your project (if applicable)
+      - name: Build
+        run: npm run build --if-present
+
+      # Run tests (replace with your actual test command)
+      - name: Test
+        run: npm test
